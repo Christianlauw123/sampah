@@ -159,6 +159,23 @@
             </div>
             <!-- /.card -->
 
+            <!-- Card Peta Kelompok -->
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-title"><a data-toggle="collapse" href="#collapse-kelompok">Peta Kelompok</a></h5>
+              </div>
+              <div id="collapse-kelompok" class="collapse">
+                <div class="card-body">
+                  <div class="row">
+                    <div id="map-kelompok" style="width:100%;height:400px;"></div>
+                    <div id="legend-kelompok" class="panel panel-primary" style="background: white; padding: 10px;">
+                      <div class="panel-heading">KETERANGAN IKON<br>! Klik garis untuk melihat detail</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <?php if(!empty($supir)){ 
               foreach($supir as $row){ ?>
 
@@ -477,7 +494,6 @@
     });
 
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
-         
   }
 
 </script>
@@ -486,6 +502,86 @@
     async defer></script>
 
 <?php } ?>
+
+<script>
+  let legendKelompok = document.getElementById('legend-kelompok');
+  for (let key in icons) {
+      let type = icons[key];
+      let name = type.name;
+      let icon = type.icon;
+      let div = document.createElement('div');
+      div.innerHTML = '<img src="' + icon + '"> ' + name;
+      legendKelompok.appendChild(div);
+  }
+
+  function initMap() {
+    let myLatLng = {lat: -3.80859, lng: 102.264435};
+
+    let mapKelompok = new google.maps.Map(document.getElementById('map-kelompok'), {
+      zoom: 8,
+      center: myLatLng
+    });
+
+    let features = [
+      <?php foreach($data_jalan->result_array() as $dt){?>
+        {
+          position: new google.maps.LatLng(<?php echo $dt['latitude']; ?>, <?php echo $dt['longitude']; ?>),
+          type: 'jalan',
+          id : '<?php echo $dt['id_jalan'] ?>',
+          nama : '<?php echo $dt['nama'] ?>',
+          lat : '<?php echo $dt['latitude'] ?>',
+          lng : '<?php echo $dt['longitude'] ?>',
+        },
+      <?php } ?>
+      <?php foreach($data_tps->result_array() as $dt){?>
+        {
+          position: new google.maps.LatLng(<?php echo $dt['latitude']; ?>, <?php echo $dt['longitude']; ?>),
+          type: 'tps',
+          id : '<?php echo $dt['id_tps'] ?>',
+          nama : '<?php echo $dt['nm_tps'] ?>',
+          lat : '<?php echo $dt['latitude'] ?>',
+          lng : '<?php echo $dt['longitude'] ?>',
+        },
+      <?php } ?>
+      <?php foreach($data_supir->result_array() as $dt){?>
+        {
+          position: new google.maps.LatLng(<?php echo $dt['latitude']; ?>, <?php echo $dt['longitude']; ?>),
+          type: 'supir',
+          id :'<?php echo $dt['id_supir'] ?>',
+          nama : '<?php echo $dt['nm_supir'] ?>',
+          lat : '<?php echo $dt['latitude'] ?>',
+          lng : '<?php echo $dt['longitude'] ?>', 
+        },
+      <?php } ?>
+    ];
+
+    features.forEach(function(feature) {
+      let contentString = `
+        <div id="content">
+          <div id="siteNotice">
+          </div>
+          <h3 id="firstHeading" class="firstHeading">${feature.nama}</h3>
+          <div id="bodyContent">
+          </div>
+        </div>
+      `;
+
+      let infowindow = new google.maps.InfoWindow({
+        content: contentString
+      });
+
+      let markersKelompok = new google.maps.Marker({
+        position: feature.position,
+        icon: icons[feature.type].icon,
+        map: mapKelompok
+      });
+
+      markersKelompok.addListener('click', function() {
+        infowindow.open(mapKelompok, markersKelompok);
+      });
+    });
+  }
+</script>
 
 </body>
 
