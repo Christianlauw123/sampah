@@ -518,7 +518,7 @@
     let myLatLng = {lat: -3.80859, lng: 102.264435};
 
     let mapKelompok = new google.maps.Map(document.getElementById('map-kelompok'), {
-      zoom: 8,
+      zoom: 12,
       center: myLatLng
     });
 
@@ -580,6 +580,70 @@
         infowindow.open(mapKelompok, markersKelompok);
       });
     });
+
+    let flightPlans = {
+      <?php if(!empty($supir)) {
+        foreach($supir as $row) { ?>
+          <?=$row['supir']['id_supir']?> : [
+            // rumah supir
+            {
+              titik_1_lat: <?=$row['supir']['latitude']?>,
+              titik_1_long: <?=$row['supir']['longitude']?>,
+              titik_2_lat: <?=$row['ruteAwal']['latitude']?>,
+              titik_2_long: <?=$row['ruteAwal']['longitude']?>
+            },
+
+            // rute jalan
+            <?php foreach($row['ruteArr'] as $dta) { ?>
+              {
+                titik_1_lat: <?=$dta['titik_1_lat']?>,
+                titik_1_long: <?=$dta['titik_1_long']?>,
+                titik_2_lat: <?=$dta['titik_2_lat']?>,
+                titik_2_long: <?=$dta['titik_2_long']?>
+              },
+            <?php } ?>
+
+            // rute ke tps
+            {
+              titik_1_lat: <?=$row['ruteAkhir']['latitude']?>,
+              titik_1_long: <?=$row['ruteAkhir']['longitude']?>,
+              titik_2_lat: <?=$row['tps']['latitude']?>,
+              titik_2_long: <?=$row['tps']['longitude']?>
+            }
+          ],
+        <?php }
+      } ?>
+    };
+
+    let fpl = flightPlans[1002];
+
+    // DRAW ROUTE
+    let directionsService = new google.maps.DirectionsService();
+    fpl.forEach(function(fp, index) {
+      let origin = {lat: fp.titik_1_lat, lng: fp.titik_1_long};
+      let destination = {lat: fp.titik_2_lat, lng: fp.titik_2_long};
+
+      let request = {
+        origin: origin,
+        destination: destination,
+        travelMode: 'DRIVING',
+      };
+
+      setTimeout(function() {
+        directionsService.route(request, function(result, status) {
+          console.log(result);
+          if (status == google.maps.DirectionsStatus.OK) {
+            new google.maps.DirectionsRenderer({
+              map: mapKelompok,
+              directions: result,
+              suppressMarkers: true
+            });
+          }
+        });
+      }, index*500);
+    });
+
+    mapKelompok.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legendKelompok);
   }
 </script>
 
