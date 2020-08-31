@@ -32,6 +32,11 @@
                 $words = explode(" ",$string);
                 return implode(" ",array_splice($words,0,$word_limit));
             }
+function toColor($n) {
+    $n = crc32($n);
+    $n &= 0xffffffff;
+    return("#".substr("000000".dechex($n),-6));
+}
                 
     ?>
 </head>
@@ -615,33 +620,38 @@
       } ?>
     };
 
-    let fpl = flightPlans[1002];
+    <?php if(!empty($supir)) {
+      foreach($supir as $row) { ?>
+        let fpl_<?=$row['supir']['id_supir']?> = flightPlans[<?=$row['supir']['id_supir']?>];
 
-    // DRAW ROUTE
-    let directionsService = new google.maps.DirectionsService();
-    fpl.forEach(function(fp, index) {
-      let origin = {lat: fp.titik_1_lat, lng: fp.titik_1_long};
-      let destination = {lat: fp.titik_2_lat, lng: fp.titik_2_long};
+        // DRAW ROUTE
+        let directionsService_<?=$row['supir']['id_supir']?> = new google.maps.DirectionsService();
+        fpl_<?=$row['supir']['id_supir']?>.forEach(function(fp, index) {
+          let origin = {lat: fp.titik_1_lat, lng: fp.titik_1_long};
+          let destination = {lat: fp.titik_2_lat, lng: fp.titik_2_long};
 
-      let request = {
-        origin: origin,
-        destination: destination,
-        travelMode: 'DRIVING',
-      };
+          let request = {
+            origin: origin,
+            destination: destination,		
+            travelMode: 'DRIVING',
+          };
 
-      setTimeout(function() {
-        directionsService.route(request, function(result, status) {
-          console.log(result);
-          if (status == google.maps.DirectionsStatus.OK) {
-            new google.maps.DirectionsRenderer({
-              map: mapKelompok,
-              directions: result,
-              suppressMarkers: true
+          setTimeout(function() {
+            directionsService_<?=$row['supir']['id_supir']?>.route(request, function(result, status) {
+              console.log(result);
+              if (status === google.maps.DirectionsStatus.OK) {
+                new google.maps.DirectionsRenderer({
+			polylineOptions: { strokeColor: "<?php echo toColor(substr($row['supir']['id_supir'],2,2));?>" },
+                  map: mapKelompok,
+                  directions: result,
+                  suppressMarkers: true
+                });
+              }
             });
-          }
+          }, index*500);
         });
-      }, index*500);
-    });
+      <?php }
+    } ?>
 
     mapKelompok.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legendKelompok);
   }

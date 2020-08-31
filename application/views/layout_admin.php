@@ -129,7 +129,7 @@
 
   <!-- Main Footer -->
   <footer class="main-footer">
-    <strong>Copyright &copy;<a href="">UNIB 2015</a>.</strong>
+    <strong>Copyright &copy;<a href="">Testing 2015</a>.</strong>
     All rights reserved.
     <div class="float-right d-none d-sm-inline-block">
       <b>Version</b> 3.0.0

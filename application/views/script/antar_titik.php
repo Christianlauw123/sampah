@@ -129,7 +129,7 @@ var x=0;
             {lat: fp.titik_2_lat, lng: fp.titik_2_long}
           ];
           var flightPath = new google.maps.Polyline({
-            path: flightPlanCoordinates,
+            // path: flightPlanCoordinates,
             geodesic: true,
             strokeColor: '#FF0000',
             strokeOpacity: 1.0,
