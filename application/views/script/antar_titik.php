@@ -105,7 +105,7 @@ var x=0;
 
               var sd = d - Math.sqrt((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2);
               var km = sd / 1000
-              document.getElementById("jarak_antar_titik").value=km;
+              document.getElementById("jarak_antar_titik").value=km.toFixed(2);
             }
 
           });
