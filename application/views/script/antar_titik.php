@@ -102,7 +102,9 @@ var x=0;
               var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
               var d = Math.round(R * c*1000);
-              document.getElementById("jarak_antar_titik").value=d;
+
+              var sd = d - Math.sqrt((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2);
+              document.getElementById("jarak_antar_titik").value=sd;
             }
 
           });
